@@ -13,7 +13,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import javax.inject.Inject;
 
 @PluginDescriptor(
-        name = "BaldyLite",
+        name = "[J] BaldyLite",
         description = "BaldyLite Custom Plugin",
         tags = {"config", "menu"},
         loadWhenOutdated = true,
@@ -50,7 +50,7 @@ public class BaldyLitePlugin extends Plugin {
 
     @Subscribe
     public void onConfigChanged(ConfigChanged configChanged) {
-        System.out.println(client.getPlayers());
+
     }
 
     @Subscribe

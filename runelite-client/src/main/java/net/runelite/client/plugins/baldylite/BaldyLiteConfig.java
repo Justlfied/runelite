@@ -9,24 +9,36 @@ import net.runelite.client.config.ConfigItem;
 public interface BaldyLiteConfig extends Config
 {
     @ConfigItem
-            (
-                    position = 1,
-                    keyName = "booleanConfig",
-                    name = "BaldyLite",
-                    description = "Highlight Bald People"
-            )
-    default boolean booleanConfig()
+    (
+        position = 1,
+        keyName = "showHairStyle",
+        name = "Show Hairstyle",
+        description = "Shows if you're bald or not"
+    )
+    default boolean showHairStyle()
     {
         return true;
     }
 
     @ConfigItem
-            (
-                    position = 2,
-                    keyName = "testAction",
-                    name = "Test Action",
-                    description = "Checkbox to Test Stuff"
-            )
+    (
+        position = 1,
+        keyName = "drawHairStyle",
+        name = "Draw baldness",
+        description = "Draws an overlay telling you if youre bald or not"
+    )
+    default boolean drawHairStyle()
+    {
+        return true;
+    }
+
+    @ConfigItem
+    (
+        position = 2,
+        keyName = "testAction",
+        name = "Test Action",
+        description = "Checkbox to Test Stuff"
+    )
     default boolean testAction()
     {
         return false;
