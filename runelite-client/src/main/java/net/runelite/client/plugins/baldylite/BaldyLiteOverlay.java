@@ -53,6 +53,8 @@ public class BaldyLiteOverlay extends OverlayPanel {
         final Player localPlayer = client.getLocalPlayer();
         final int offset;
 
+        System.out.println(localPlayer.getPlayerComposition());
+        
         offset = localPlayer.getLogicalHeight() + 40;
 
         final String isBald = Text.sanitize(plugin.isBald(plugin.getPlayerHairstyle()));

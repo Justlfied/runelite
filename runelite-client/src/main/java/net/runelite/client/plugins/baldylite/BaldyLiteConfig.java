@@ -22,9 +22,9 @@ public interface BaldyLiteConfig extends Config
 
     @ConfigItem
     (
-        position = 1,
+        position = 2,
         keyName = "drawHairStyle",
-        name = "Draw baldness",
+        name = "    Draw baldness <hr>",
         description = "Draws an overlay telling you if youre bald or not"
     )
     default boolean drawHairStyle()
@@ -34,7 +34,7 @@ public interface BaldyLiteConfig extends Config
 
     @ConfigItem
     (
-        position = 2,
+        position = 3,
         keyName = "testAction",
         name = "Test Action",
         description = "Checkbox to Test Stuff"

@@ -2,15 +2,25 @@ package net.runelite.client.plugins.baldylite;
 
 import com.google.inject.Provides;
 import net.runelite.api.Client;
+import net.runelite.api.NPC;
+import net.runelite.api.Player;
 import net.runelite.api.Skill;
+import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.ClientTick;
+import net.runelite.api.events.GameTick;
+import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
+import net.runelite.client.util.Text;
+
 import javax.inject.Inject;
+import java.util.Arrays;
+import java.util.List;
 
 @PluginDescriptor(
         name = "[J] BaldyLite",
@@ -50,12 +60,23 @@ public class BaldyLitePlugin extends Plugin {
 
     @Subscribe
     public void onConfigChanged(ConfigChanged configChanged) {
+        if(!config.testAction()) {
+            return;
+        }
 
+        List<NPC> npcList = client.getNpcs();
+
+        //System.out.println(Arrays.toString(npcList.toArray()));
     }
 
     @Subscribe
     public void onClientTick(ClientTick clientTick) {
 
+    }
+
+    @Subscribe
+    public void onChatMessage(ChatMessage chatMessage) {
+        System.out.println(chatMessage.getMessage());
     }
 
     public int getPlayerHairstyle() {
