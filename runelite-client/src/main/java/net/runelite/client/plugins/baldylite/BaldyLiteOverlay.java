@@ -53,7 +53,9 @@ public class BaldyLiteOverlay extends OverlayPanel {
         final Player localPlayer = client.getLocalPlayer();
         final int offset;
 
-        System.out.println(localPlayer.getPlayerComposition());
+        if(localPlayer == null) {
+            return;
+        }
         
         offset = localPlayer.getLogicalHeight() + 40;
 

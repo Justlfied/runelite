@@ -69,16 +69,6 @@ public class BaldyLitePlugin extends Plugin {
         //System.out.println(Arrays.toString(npcList.toArray()));
     }
 
-    @Subscribe
-    public void onClientTick(ClientTick clientTick) {
-
-    }
-
-    @Subscribe
-    public void onChatMessage(ChatMessage chatMessage) {
-        System.out.println(chatMessage.getMessage());
-    }
-
     public int getPlayerHairstyle() {
         return client.getVarpValue(261);
     }
