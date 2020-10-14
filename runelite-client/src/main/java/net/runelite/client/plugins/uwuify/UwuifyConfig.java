@@ -8,18 +8,10 @@ import net.runelite.client.config.ConfigSection;
 @ConfigGroup("uwuify")
 public interface UwuifyConfig extends Config
 {
-    @ConfigSection
-    (
-        name = "UwUify Chatbox",
-        description = "Toggle which messages in chatbox should get Uwuified",
-        position = 99
-    )
-    String highlightSection = "section";
-
     @ConfigItem
     (
         position = 4,
-        name = "UwUify NPC Dialog",
+        name = "NPC Dialog",
         keyName = "changeNpcDialog",
         description = "UwUify Chatbox Dialog of NPC's"
     )
@@ -29,22 +21,10 @@ public interface UwuifyConfig extends Config
 
     @ConfigItem
     (
-        position = 5,
-        name = "UwUIify Chatbox Messages",
-        keyName = "changeChatboxMessage",
-        description = "UwUify Chatbox Messages"
-    )
-    default boolean changeChatboxMessage() {
-        return false;
-    }
-
-    @ConfigItem
-    (
         position = 1,
-        name = "UwUify Game Messages",
+        name = "Game Messages",
         keyName = "changeChatboxGameMessage",
-        description = "UwUify Game Messages",
-        section = "highlightSection"
+        description = "UwUify Game Messages"
     )
     default boolean changeChatboxGameMessage() {
         return false;
@@ -53,10 +33,9 @@ public interface UwuifyConfig extends Config
     @ConfigItem
     (
         position = 2,
-        name = "UwUify Private Messages",
+        name = "Private Messages",
         keyName = "changeChatboxPrivateMessage",
-        description = "UwUify Private Messages",
-        section = "highlightSection"
+        description = "UwUify Private Messages"
     )
     default boolean changeChatboxPrivateMessage() {
         return false;
@@ -65,10 +44,9 @@ public interface UwuifyConfig extends Config
     @ConfigItem
     (
         position = 3,
-        name = "UwUify Public Messages",
+        name = "Public Messages",
         keyName = "changeChatboxPublicMessage",
-        description = "UwUify Public Messages",
-        section = "highlightSection"
+        description = "UwUify Public Messages"
     )
     default boolean changeChatboxPublicMessage()
     {
@@ -77,10 +55,9 @@ public interface UwuifyConfig extends Config
 
     @ConfigItem(
         position = 6,
-        name = "UwUify Clan Messages",
+        name = "Clan Messages",
         keyName = "changeChatboxClanMessage",
-        description = "UwUify Clan Messages",
-        section = "highlightSection"
+        description = "UwUify Clan Messages"
     )
     default boolean changeChatboxClanMessage()
     {

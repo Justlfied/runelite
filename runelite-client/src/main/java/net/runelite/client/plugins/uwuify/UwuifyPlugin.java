@@ -69,12 +69,6 @@ public class UwuifyPlugin extends Plugin {
 
     @Subscribe
     public void onChatMessage(ChatMessage chatMessage) {
-        System.out.println(chatMessage.getType());
-
-        if(!config.changeChatboxMessage()) {
-            return;
-        }
-
         String newChatMessage = "";
 
         if(chatMessage.getType() == ChatMessageType.PUBLICCHAT && config.changeChatboxPublicMessage()) {
