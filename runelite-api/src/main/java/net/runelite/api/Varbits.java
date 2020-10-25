@@ -322,6 +322,7 @@ public enum Varbits
 	 * Theatre of Blood 1=In Party, 2=Inside/Spectator, 3=Dead Spectating
 	 */
 	THEATRE_OF_BLOOD(6440),
+	THEATRE_OF_BLOOD_BOSS_HP(6448),
 
 	/**
 	 * Nightmare Zone
