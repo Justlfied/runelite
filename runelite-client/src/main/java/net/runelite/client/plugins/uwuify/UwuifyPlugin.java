@@ -73,14 +73,18 @@ public class UwuifyPlugin extends Plugin {
     public void onChatMessage(ChatMessage chatMessage) {
         // Exceptions
         if(ChatMessageType.FRIENDSCHATNOTIFICATION == chatMessage.getType()
-            || chatMessage.getMessage().toLowerCase().contains("stalled wave")) {
+            || chatMessage.getMessage().toLowerCase().contains("stalled wave") // xz_tob stalled wave
+            || chatMessage.getMessage().toLowerCase().contains("<col=b4281e")  // socket leave
+            || chatMessage.getMessage().toLowerCase().contains("<col=008000")  // socket join
+            || chatMessage.getMessage().toLowerCase().contains("<col=222222")) // Sotetseg maze splits
+        {
             return;
         }
 
         String newChatMessage = "";
 
-        // Check is chat message contains red text
-        if(chatMessage.getMessage().toLowerCase().contains("<col=ff0000>")) {
+        // Check is chat message contains red text or EF1020 (ToB splits color)
+        if(chatMessage.getMessage().toLowerCase().contains("<col=ff0000>") || chatMessage.getMessage().toLowerCase().contains("<col=ef1020")) {
             newChatMessage = getColoredTextType(chatMessage.getMessage());
 
             final MessageNode messageNode = chatMessage.getMessageNode();
