@@ -17,8 +17,11 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.util.Text;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @PluginDescriptor(
     name = "[J] UwUify",
@@ -66,10 +69,27 @@ public class UwuifyPlugin extends Plugin {
         client.refreshChat();
     }
 
-
     @Subscribe
     public void onChatMessage(ChatMessage chatMessage) {
+        // Exceptions
+        if(ChatMessageType.FRIENDSCHATNOTIFICATION == chatMessage.getType()
+            || chatMessage.getMessage().toLowerCase().contains("stalled wave")) {
+            return;
+        }
+
         String newChatMessage = "";
+
+        // Check is chat message contains red text
+        if(chatMessage.getMessage().toLowerCase().contains("<col=ff0000>")) {
+            newChatMessage = getColoredTextType(chatMessage.getMessage());
+
+            final MessageNode messageNode = chatMessage.getMessageNode();
+            messageNode.setRuneLiteFormatMessage(newChatMessage);
+            chatMessageManager.update(messageNode);
+            client.refreshChat();
+
+            return;
+        }
 
         if(chatMessage.getType() == ChatMessageType.PUBLICCHAT && config.changeChatboxPublicMessage()) {
             newChatMessage = buildUwUifyString(chatMessage.getMessage());
@@ -108,4 +128,47 @@ public class UwuifyPlugin extends Plugin {
         return newDialog;
     }
 
+    public String getColoredTextType(String chatMessage) {
+        if(chatMessage.contains("kill count:")) {
+            //killcountUwUify(chatMessage);
+        } else if(chatMessage.contains("Wave '")) {
+            return tobRoomUwUify(chatMessage);
+        }
+
+        return "";
+    }
+
+    public String tobRoomUwUify(String chatMessage) {
+        String noTagsChatMessage = chatMessage.replaceAll("<col=ff0000>", "").replaceAll("</col>", "");
+
+        String pattern = "(?:(?:([01]?\\d|2[0-3]):)?([0-5]?\\d):)?([0-5]?\\d)";
+
+        // Create a Pattern object
+        Pattern r = Pattern.compile(pattern);
+
+        // Now create matcher object.
+        Matcher m = r.matcher(noTagsChatMessage);
+
+        String[] regexGroup = new String[10];
+        Integer regexGroupIndex = 0;
+
+        // Loop through matches an assigned them to a variable
+        while(m.find()) {
+            regexGroupIndex++;
+            regexGroup[regexGroupIndex] = m.group();
+        }
+
+        // Cut the room finished string into pieces
+        String beforeTime = StringUtils.substringBefore(noTagsChatMessage, regexGroup[1]);
+        String uwuifiedBeforeTime = uwuify(beforeTime);
+
+        // Make new chat message
+        String newChatMessage = uwuifiedBeforeTime +
+            "<col=ff0000>" +
+            regexGroup[1] + "</col>" +
+            " Totaw: " +
+            "<col=ff0000>" + regexGroup[2] + "</col>.";
+
+        return newChatMessage;
+    }
 }
