@@ -5,6 +5,9 @@ import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.MessageNode;
 import net.runelite.api.events.ChatMessage;
+import net.runelite.api.events.GameTick;
+import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatMessageBuilder;
 import net.runelite.client.chat.ChatMessageManager;
@@ -12,6 +15,7 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.util.Text;
 
 import javax.inject.Inject;
 
@@ -40,6 +44,24 @@ public class UwUifyV2Plugin extends Plugin {
     }
 
     @Subscribe
+    public void onGameTick(GameTick gameTick) {
+        if(!config.changeNpcDialog()) {
+            return;
+        }
+
+        Widget npcDialog = client.getWidget(WidgetInfo.DIALOG_NPC_TEXT);
+
+        // Check if dialog exists on screen
+        if(npcDialog == null) {
+            return;
+        }
+
+        String npcDialogText = Text.removeTags(client.getWidget(WidgetInfo.DIALOG_NPC_TEXT).getText());
+
+        npcDialog.setText(uwuify(npcDialogText));
+    }
+
+    @Subscribe
     public void onChatMessage(ChatMessage chatMessage) {
         String newChatMessage;
         if ((chatMessage.getType() == ChatMessageType.PUBLICCHAT && config.changeChatboxPublicMessage())
@@ -61,7 +83,7 @@ public class UwUifyV2Plugin extends Plugin {
     public String uwuify(String normalText) {
         String newDialog = normalText
             .replace("l", "w")
-            .replace("I ", "me")
+            .replace("I ", "me ")
             .replace("you", "u")
             .replace("r", "w")
             .replace("the", "da")
