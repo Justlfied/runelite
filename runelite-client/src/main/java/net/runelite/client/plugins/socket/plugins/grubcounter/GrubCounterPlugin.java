@@ -6,13 +6,16 @@ import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.client.callback.ClientThread;
+import net.runelite.client.config.ConfigItem;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.raidsscouter.Raids1Util;
 import net.runelite.client.plugins.socket.org.json.JSONObject;
 import net.runelite.client.plugins.socket.packet.SocketBroadcastPacket;
 import net.runelite.client.plugins.socket.packet.SocketReceivePacket;
+import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.eventbus.EventBus;
 
 import javax.inject.Inject;
@@ -36,11 +39,17 @@ public class GrubCounterPlugin extends Plugin {
     @Inject
     private ClientThread clientThread;
 
+    @Inject
+    private GrubCounterOverlay grubCounterOverlay;
+
+    @Inject
+    private OverlayManager overlayManager;
+
     private int last_grubs;
     int num_grubs;
     GrubCollection gc_local;
-    private Map<String, JSONObject> members = new ConcurrentHashMap();
-    private Map<String, Integer> total = new ConcurrentHashMap();
+    public Map<String, JSONObject> members = new ConcurrentHashMap();
+    public Map<String, Integer> total = new ConcurrentHashMap();
 
     class GrubCollection
     {
@@ -52,6 +61,22 @@ public class GrubCounterPlugin extends Plugin {
     int gc_others_count = 0;
 
     private int count = 0;
+
+    @Override
+    public void startUp() {
+        overlayManager.add(grubCounterOverlay);
+    }
+
+    @Override
+    public void shutDown() {
+        overlayManager.remove(grubCounterOverlay);
+    }
+
+    @Subscribe
+    public void onConfigChanged(ConfigChanged configItem) {
+        this.members.clear();
+        this.total.clear();
+    }
 
     @Subscribe
     public void onGameTick(GameTick gameTick) {
@@ -66,8 +91,8 @@ public class GrubCounterPlugin extends Plugin {
         int base_y = client.getBaseY();
 
         WorldPoint wp = client.getLocalPlayer().getWorldLocation();
-        int x = wp.getX() - client.getBaseX();
-        int y = wp.getY() - client.getBaseY();
+        int x = wp.getX() - base_x;
+        int y = wp.getY() - base_y;
         int type = Raids1Util.getroom_type(client.getInstanceTemplateChunks()[plane][x / 8][y / 8]);
 
         // Debug every 10 ticks (6 seconds)
@@ -76,8 +101,10 @@ public class GrubCounterPlugin extends Plugin {
             System.out.println("Socket Total: " + total);
         }
 
-        if(type == 13) {
-
+        if(type != 13) {
+            this.members.clear();
+            this.total.clear();
+            return;
         }
 
         count++;
@@ -112,11 +139,25 @@ public class GrubCounterPlugin extends Plugin {
         }
 
         if(opened) {
-            if(grub) {
-                addGrubs();
+            int angle = object.getOrientation().getAngle() >> 9;
+            int px = x + ((angle == 1) ? -1 : ((angle == 3) ? 1 : 0));
+            int py = y + ((angle == 0) ? -1 : ((angle == 2) ? 1 : 0));
+
+            for(Player player : client.getPlayers()) {
+                WorldPoint wp = player.getWorldLocation();
+                int plx = wp.getX() - this.client.getBaseX();
+                int ply = wp.getY() - this.client.getBaseY();
+                if (plx == px && ply == py) {
+                    if (grub && client.getLocalPlayer() == player) {
+                        addGrubs();
+                        return;
+                    }
+                }
             }
         }
+
         addEmpty(this.client.getLocalPlayer());
+        return;
     }
 
     private void addGrubs() {
@@ -145,6 +186,8 @@ public class GrubCounterPlugin extends Plugin {
         JSONObject payload = new JSONObject();
         payload.put("bat-counter", data);
         eventBus.post(new SocketBroadcastPacket(payload));
+
+        return;
 
         /*
             Local JSONObject
@@ -188,6 +231,8 @@ public class GrubCounterPlugin extends Plugin {
         JSONObject payload = new JSONObject();
         payload.put("bat-counter", data);
         eventBus.post(new SocketBroadcastPacket(payload));
+
+        return;
     }
 
     @Subscribe
@@ -220,5 +265,12 @@ public class GrubCounterPlugin extends Plugin {
         grubs.put("chestWithGrubs", chestWithGrubs);
         members.put(player, grubs);
         total.put("total", (Integer)total.getOrDefault("total", 0) + grubsReceived);
+    }
+
+    Map<String, JSONObject> getMembers() {
+        return members;
+    }
+    Map<String, Integer> getTotal() {
+        return total;
     }
 }
