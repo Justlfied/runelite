@@ -46,20 +46,14 @@ public class GrubCounterPlugin extends Plugin {
     private OverlayManager overlayManager;
 
     private int last_grubs;
-    int num_grubs;
-    int chestOpened;
-    int chestWithGrubs;
+    private int num_grubs;
+    private int chestOpened;
+    private int chestWithGrubs;
 
     public Map<String, JSONObject> members = new ConcurrentHashMap();
     public Map<String, Integer> total = new ConcurrentHashMap();
 
-//    class GrubCollection
-//    {
-//        String displayname;
-//        int num_opened;
-//        int num_with_grubs;
-//    }
-
+    // Solely used for debugging purposes
     private int count = 0;
 
     @Override
@@ -84,17 +78,14 @@ public class GrubCounterPlugin extends Plugin {
 
         // Player is not in raid
         if(client.getVar(Varbits.IN_RAID) == 0) {
+            this.members.clear();
             return;
         }
 
-        int plane = client.getPlane();
-        int base_x = client.getBaseX();
-        int base_y = client.getBaseY();
-
         WorldPoint wp = client.getLocalPlayer().getWorldLocation();
-        int x = wp.getX() - base_x;
-        int y = wp.getY() - base_y;
-        int type = Raids1Util.getroom_type(client.getInstanceTemplateChunks()[plane][x / 8][y / 8]);
+        int x = wp.getX() - client.getBaseX();
+        int y = wp.getY() - client.getBaseY();
+        int type = Raids1Util.getroom_type(client.getInstanceTemplateChunks()[client.getPlane()][x / 8][y / 8]);
 
         // Debug every 10 ticks (6 seconds)
         if(count % 10 == 0 ) {
@@ -102,6 +93,7 @@ public class GrubCounterPlugin extends Plugin {
             System.out.println("Socket Total: " + total);
         }
 
+        // If room isnt thieving
         if(type != 13) {
             this.members.clear();
             this.total.clear();
@@ -119,7 +111,6 @@ public class GrubCounterPlugin extends Plugin {
 
     @Subscribe
     public void onGameObjectSpawned(GameObjectSpawned gameObject) {
-        int chestY, chestX;
         GameObject object = gameObject.getGameObject();
 
         if (object.getId() != 29745 && object.getId() != 29743 && object.getId() != 29744) {
@@ -144,13 +135,6 @@ public class GrubCounterPlugin extends Plugin {
             int px = x + ((angle == 1) ? -1 : ((angle == 3) ? 1 : 0));
             int py = y + ((angle == 0) ? -1 : ((angle == 2) ? 1 : 0));
 
-            System.out.println(
-                "Object x Angled: " + px + " | "
-                + "Object y Angled: " + py + "\n"
-                + "Real Object x: " + x + "| "
-                + "Real Object y: " + y);
-
-            //for(Player player : client.getPlayers()) {
                 WorldPoint wp = client.getLocalPlayer().getWorldLocation();
                 int plx = wp.getX() - this.client.getBaseX();
                 int ply = wp.getY() - this.client.getBaseY();
@@ -182,7 +166,6 @@ public class GrubCounterPlugin extends Plugin {
                     }
                      */
                 }
-            //}
         }
 
 
