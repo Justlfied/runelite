@@ -47,18 +47,18 @@ public class GrubCounterPlugin extends Plugin {
 
     private int last_grubs;
     int num_grubs;
-    GrubCollection gc_local;
+    int chestOpened;
+    int chestWithGrubs;
+
     public Map<String, JSONObject> members = new ConcurrentHashMap();
     public Map<String, Integer> total = new ConcurrentHashMap();
 
-    class GrubCollection
-    {
-        String displayname;
-        int num_opened;
-        int num_with_grubs;
-    }
-    GrubCollection[] gc_others = new GrubCollection[99];
-    int gc_others_count = 0;
+//    class GrubCollection
+//    {
+//        String displayname;
+//        int num_opened;
+//        int num_with_grubs;
+//    }
 
     private int count = 0;
 
@@ -76,6 +76,7 @@ public class GrubCounterPlugin extends Plugin {
     public void onConfigChanged(ConfigChanged configItem) {
         this.members.clear();
         this.total.clear();
+
     }
 
     @Subscribe
@@ -143,91 +144,85 @@ public class GrubCounterPlugin extends Plugin {
             int px = x + ((angle == 1) ? -1 : ((angle == 3) ? 1 : 0));
             int py = y + ((angle == 0) ? -1 : ((angle == 2) ? 1 : 0));
 
-            for(Player player : client.getPlayers()) {
-                WorldPoint wp = player.getWorldLocation();
+            System.out.println(
+                "Object x Angled: " + px + " | "
+                + "Object y Angled: " + py + "\n"
+                + "Real Object x: " + x + "| "
+                + "Real Object y: " + y);
+
+            //for(Player player : client.getPlayers()) {
+                WorldPoint wp = client.getLocalPlayer().getWorldLocation();
                 int plx = wp.getX() - this.client.getBaseX();
                 int ply = wp.getY() - this.client.getBaseY();
+
                 if (plx == px && ply == py) {
-                    if (grub && client.getLocalPlayer() == player) {
+                    if (grub) {
                         addGrubs();
-                        return;
+                    } else {
+                        addEmpty();
                     }
+
+                    /*
+
+                    Check chest and player coordinates
+                    if (plx == px && ply == py) {
+
+                      If chest got gruns and player == localPlayer
+                      if (grub && pl == this.client.getLocalPlayer()) {
+                        add_grubs_local(); break;
+
+                      If chest has only grubs
+                      }  if (grub) {
+                        add_grubs_other(pl); break;
+                      }
+
+                      Otherwise add empty
+                      add_empty(pl);
+                      break;
+                    }
+                     */
                 }
-            }
+            //}
         }
 
-        addEmpty(this.client.getLocalPlayer());
-        return;
+
     }
 
     private void addGrubs() {
-        GrubCollection gc = this.gc_local;
-        if (gc == null) {
-            gc = this.gc_local = new GrubCollection();
-            gc.displayname = this.client.getLocalPlayer().getName();
-        }
         int grubs = this.client.getItemContainer(InventoryID.INVENTORY)
             .count(20885);
         int delta = grubs - this.last_grubs;
         this.num_grubs += delta;
         this.last_grubs = grubs;
-        gc.num_opened++;
-        gc.num_with_grubs++;
+        chestOpened++;
+        chestWithGrubs++;
 
         if(delta == 0) {
             return;
         }
 
         JSONObject data = new JSONObject();
-        data.put("player", gc.displayname);
+        data.put("player", client.getLocalPlayer().getName());
         data.put("grubsReceived", delta);
-        data.put("chestOpened", gc.num_opened);
-        data.put("chestWithGrubs", gc.num_with_grubs);
+        data.put("chestOpened", chestOpened);
+        data.put("chestWithGrubs", chestWithGrubs);
         JSONObject payload = new JSONObject();
         payload.put("bat-counter", data);
         eventBus.post(new SocketBroadcastPacket(payload));
 
         return;
-
-        /*
-            Local JSONObject
-            {10, 20}
-
-            Socket Player Map
-            <String, Local JSONObject>
-            <Justlfied, {10, 20}>
-
-
-         */
     }
 
-    private void addEmpty(Player pl) {
-        GrubCollection gc = this.gc_local;
-        if (gc == null) {
-            gc = this.gc_local = new GrubCollection();
-            gc.displayname = this.client.getLocalPlayer().getName();
-        }
-        int hash = pl.getName().hashCode();
-        if (hash != gc.displayname.hashCode()) {
-            gc = null;
-            for (int i = 0; i < this.gc_others_count; i++) {
-                if (hash == (this.gc_others[i]).displayname.hashCode()) {
-                    gc = this.gc_others[i];
-                    break;
-                }
-            }
-            if (gc == null) {
-                gc = this.gc_others[this.gc_others_count++] = new GrubCollection();
-                gc.displayname = pl.getName();
-            }
-        }
-        gc.num_opened++;
+    private void addEmpty() {
+        chestOpened++;
+
+        System.out.println("[SOCKET DATA] Playername: " + client.getLocalPlayer().getName() + " | Grubs Received: " + 0 + " | Chests Opened: " + chestOpened + " | Chests With Grubs: " + chestWithGrubs);
 
         JSONObject data = new JSONObject();
-        data.put("player", gc.displayname);
+        data.put("player", client.getLocalPlayer().getName());
         data.put("grubsReceived", 0);
-        data.put("chestOpened", gc.num_opened);
-        data.put("chestWithGrubs", gc.num_with_grubs);
+        data.put("chestOpened", chestOpened);
+        data.put("chestWithGrubs", chestWithGrubs);
         JSONObject payload = new JSONObject();
         payload.put("bat-counter", data);
         eventBus.post(new SocketBroadcastPacket(payload));
@@ -252,7 +247,7 @@ public class GrubCounterPlugin extends Plugin {
 
         JSONObject data = payload.getJSONObject("bat-counter");
 
-        System.out.println(payload);
+        System.out.println("Payload: " + payload);
 
         clientThread.invoke(() -> {
             updateBatCounterMember(data.getString("player"), data.getInt("chestOpened"), data.getInt("chestWithGrubs"), data.getInt("grubsReceived"));
