@@ -1,17 +1,22 @@
 package net.runelite.client.plugins.discordraredropnotifier;
 
+import com.google.inject.Provides;
 import lombok.SneakyThrows;
 import net.runelite.api.Client;
 import net.runelite.client.callback.ClientThread;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.NpcLootReceived;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import javax.inject.Inject;
+
+import net.runelite.client.plugins.socket.org.json.JSONArray;
+import net.runelite.client.plugins.socket.org.json.JSONObject;
 import okhttp3.*;
-import org.json.JSONArray;
-import org.json.JSONObject;
+//import org.json.JSONArray;
+//import org.json.JSONObject;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Arrays;
@@ -25,7 +30,6 @@ public class DiscordRareDropNotifierPlugin extends Plugin {
 
     private static final String API_ROOT = "api.osrsbox.com";
     private static final String API_PATH_NPCS = "monsters";
-    private static final String API_PATH_ITEMS = "items";
 
     private OkHttpClient httpClient = null;
 
@@ -38,15 +42,25 @@ public class DiscordRareDropNotifierPlugin extends Plugin {
     @Inject
     private ClientThread clientThread;
 
+    @Inject
+    private DiscordRareDropNotifierConfig config;
+
+    @Provides
+    DiscordRareDropNotifierConfig config(ConfigManager configManager) {
+        return configManager.getConfig(DiscordRareDropNotifierConfig.class);
+    }
+
     @Subscribe
     public void onNpcLootReceived(NpcLootReceived npcLootReceived) {
-        // Function to check if the npc thats being killed is something that can drop loot
+        if(config.webhookUrl() == null) {
+            return;
+        }
 
         npcLootReceived.getItems().forEach((itemStack) -> {
             Integer itemID = itemStack.getId();
 
             // Bones ItemID
-            if(itemID == 526) {
+            if(isRareDrop(itemID)) {
                 Integer npcID = npcLootReceived.getNpc().getId();
 
                 HttpUrl url = new HttpUrl.Builder().scheme("https").host(API_ROOT).addPathSegment(API_PATH_NPCS)
@@ -72,7 +86,7 @@ public class DiscordRareDropNotifierPlugin extends Plugin {
                         if(response.isSuccessful()) {
                             String responseBody = response.body().string();
 
-                            JSONObject jsonObject = new JSONObject(responseBody);
+                            net.runelite.client.plugins.socket.org.json.JSONObject jsonObject = new JSONObject(responseBody);
                             JSONArray dropsArray = jsonObject.getJSONArray("drops");
 
                             for(Integer i = 0; i < jsonObject.getJSONArray("drops").length(); i++) {
@@ -91,7 +105,7 @@ public class DiscordRareDropNotifierPlugin extends Plugin {
                                             final int gePrice = itemManager.getItemPrice(itemID);
                                             final int haPrice = itemManager.getItemComposition(itemID).getHaPrice();
 
-                                            DiscordWebhook webhook = new DiscordWebhook("https://discord.com/api/webhooks/791336920365006860/dXBe90zwHfMWDB9idrZywz7tuSSkpSeWDket0mQAFKZatQM13aNagfnRqmUCaVKuU1oN");
+                                            DiscordWebhook webhook = new DiscordWebhook(config.webhookUrl());
                                             webhook.setUsername("Justy");
                                             webhook.setTts(false);
                                             webhook.addEmbed(new DiscordWebhook.EmbedObject()
@@ -105,7 +119,7 @@ public class DiscordRareDropNotifierPlugin extends Plugin {
                                             e.printStackTrace();
                                         }
                                     });
-
+                                    return;
                                 }
                             }
                             response.close();
@@ -114,5 +128,13 @@ public class DiscordRareDropNotifierPlugin extends Plugin {
                 });
             }
         });
+    }
+
+    private Boolean isRareDrop(Integer itemID) {
+        for(NotifiyItems items : NotifiyItems.values()) {
+            return items.getId() == itemID;
+        }
+
+        return false;
     }
 }
