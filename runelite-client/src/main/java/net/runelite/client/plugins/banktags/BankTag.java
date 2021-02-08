@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Brooklyn <https://github.com/Broooklyn>
+ * Copyright (c) 2021, Adam <Adam@sigterm.info>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,15 +23,9 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.worldmap;
+package net.runelite.client.plugins.banktags;
 
-import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
-
-public class KourendTaskPoint extends WorldMapPoint
+public interface BankTag
 {
-	KourendTaskPoint(KourendTaskLocation data)
-	{
-		super(data.getLocation(), WorldMapPlugin.BLANK_ICON);
-		setTooltip(data.getTooltip());
-	}
+	boolean contains(int itemId);
 }
