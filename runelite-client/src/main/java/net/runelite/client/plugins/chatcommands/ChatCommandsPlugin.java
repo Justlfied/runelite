@@ -481,10 +481,14 @@ public class ChatCommandsPlugin extends Plugin
 			advLogLoaded = false;
 
 			Widget adventureLog = client.getWidget(WidgetInfo.ADVENTURE_LOG);
-			Matcher advLogExploitsText = ADVENTURE_LOG_TITLE_PATTERN.matcher(adventureLog.getChild(ADV_LOG_EXPLOITS_TEXT_INDEX).getText());
-			if (advLogExploitsText.find())
+
+			if (adventureLog != null)
 			{
-				pohOwner = advLogExploitsText.group(1);
+				Matcher advLogExploitsText = ADVENTURE_LOG_TITLE_PATTERN.matcher(adventureLog.getChild(ADV_LOG_EXPLOITS_TEXT_INDEX).getText());
+				if (advLogExploitsText.find())
+				{
+					pohOwner = advLogExploitsText.group(1);
+				}
 			}
 		}
 
@@ -666,7 +670,7 @@ public class ChatCommandsPlugin extends Plugin
 			.append(ChatColorType.NORMAL)
 			.append(" kill count: ")
 			.append(ChatColorType.HIGHLIGHT)
-			.append(Integer.toString(kc))
+			.append(String.format("%,d", kc))
 			.build();
 
 		log.debug("Setting response {}", response);
@@ -748,15 +752,15 @@ public class ChatCommandsPlugin extends Plugin
 			.append(ChatColorType.NORMAL)
 			.append("Duel Arena wins: ")
 			.append(ChatColorType.HIGHLIGHT)
-			.append(Integer.toString(wins))
+			.append(String.format("%,d", wins))
 			.append(ChatColorType.NORMAL)
 			.append("   losses: ")
 			.append(ChatColorType.HIGHLIGHT)
-			.append(Integer.toString(losses))
+			.append(String.format("%,d", losses))
 			.append(ChatColorType.NORMAL)
 			.append("   streak: ")
 			.append(ChatColorType.HIGHLIGHT)
-			.append(Integer.toString((winningStreak != 0 ? winningStreak : -losingStreak)))
+			.append(String.format("%,d", winningStreak != 0 ? winningStreak : -losingStreak))
 			.build();
 
 		log.debug("Setting response {}", response);
@@ -957,7 +961,7 @@ public class ChatCommandsPlugin extends Plugin
 			.append(ChatColorType.NORMAL)
 			.append("Barbarian Assault High-level gambles: ")
 			.append(ChatColorType.HIGHLIGHT)
-			.append(Integer.toString(gc))
+			.append(String.format("%,d", gc))
 			.build();
 
 		log.debug("Setting response {}", response);
@@ -1420,7 +1424,7 @@ public class ChatCommandsPlugin extends Plugin
 				.append(ChatColorType.NORMAL)
 				.append("Clue scroll (" + level + ")").append(": ")
 				.append(ChatColorType.HIGHLIGHT)
-				.append(Integer.toString(quantity));
+				.append(String.format("%,d", quantity));
 
 			if (rank != -1)
 			{
