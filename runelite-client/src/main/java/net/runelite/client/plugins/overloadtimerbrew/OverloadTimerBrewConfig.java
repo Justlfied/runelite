@@ -15,4 +15,14 @@ public interface OverloadTimerBrewConfig extends Config {
     default boolean tickCounter() {
         return false;
     };
+
+    @ConfigItem(
+        position = 2,
+        keyName = "tickOverlay",
+        name = "Tickcounter Overlay",
+        description = "Shows very aggresive looking overlay of ticks until brew"
+    )
+    default boolean tickOverlay() {
+        return false;
+    }
 }

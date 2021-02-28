@@ -24,6 +24,9 @@ public class OverloadTimerBrewPlugin extends Plugin {
     @Inject
     private OverloadTimerBrewOverlay overlay;
 
+    @Inject
+    private OverloadTimerBrewOverlayWarning overlayWarning;
+
     public int overloadTimer = 0;
     public String overloadTimerTime = "";
     public Color overloadTimeColor = new Color(255, 0, 0);
@@ -32,12 +35,14 @@ public class OverloadTimerBrewPlugin extends Plugin {
     protected void startUp()
     {
         overlayManager.add(overlay);
+        overlayManager.add(overlayWarning);
     }
 
     @Override
     protected void shutDown()
     {
         overlayManager.remove(overlay);
+        overlayManager.remove(overlayWarning);
     }
 
     @Provides
@@ -50,7 +55,13 @@ public class OverloadTimerBrewPlugin extends Plugin {
     public void onChatMessage(ChatMessage chatMessage) {
         String message = chatMessage.getMessage();
 
+        System.out.println("Message: " + message);
+
         if(message.startsWith("You drink some of your") && message.contains("overload")) {
+            overloadTimer = 300;
+        }
+
+        if(message.contains("Ovltest") || message.contains("ovltest")) {
             overloadTimer = 300;
         }
     }
@@ -70,6 +81,8 @@ public class OverloadTimerBrewPlugin extends Plugin {
         if(overloadTimer % 25 < 6) {
             overloadTimeColor = new Color(0, 255, 0);
         }
+
+        System.out.println("Ovl TickCounter: " + overloadTimer);
 
         overloadTimerTime = setOvlTimerString(overloadTimer);
     }
