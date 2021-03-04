@@ -25,4 +25,14 @@ public interface OverloadTimerBrewConfig extends Config {
     default boolean tickOverlay() {
         return false;
     }
+
+    @ConfigItem(
+        position = 3,
+        keyName = "cycleCounter",
+        name = "Show remaining cycles",
+        description = "Change the tickcounter to a cycle counter"
+    )
+    default boolean cycleCounter() {
+        return true;
+    }
 }

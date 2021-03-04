@@ -1,5 +1,7 @@
 package net.runelite.client.plugins.overloadtimerbrew;
 
+import net.runelite.api.Client;
+import net.runelite.api.Varbits;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.overlay.WidgetItemOverlay;
@@ -19,8 +21,16 @@ public class OverloadTimerBrewOverlay extends WidgetItemOverlay {
         this.config = config;
     }
 
+    @Inject
+    private Client client;
+
     public void renderItemOverlay(Graphics2D graphics, int itemId, WidgetItem widgetItem) {
         if(plugin.overloadTimer == 0) {
+            return;
+        }
+
+        if (client.getVar(Varbits.IN_RAID) != 1)
+        {
             return;
         }
 
