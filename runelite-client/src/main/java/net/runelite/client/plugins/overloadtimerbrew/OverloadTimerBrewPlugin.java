@@ -59,15 +59,15 @@ public class OverloadTimerBrewPlugin extends Plugin {
         return configManager.getConfig(OverloadTimerBrewConfig.class);
     }
 
-    @Subscribe
-    public void onVarbitChanged(VarbitChanged event)
-    {
-        int raidVarb = client.getVar(Varbits.IN_RAID);
-        if (lastRaidVarb != raidVarb)
-        {
-            overloadTimer = 0;
-        }
-    }
+//    @Subscribe
+//    public void onVarbitChanged(VarbitChanged event)
+//    {
+//        int raidVarb = client.getVar(Varbits.IN_RAID);
+//        if (lastRaidVarb != raidVarb)
+//        {
+//            overloadTimer = 0;
+//        }
+//    }
 
     @Subscribe
     public void onChatMessage(ChatMessage chatMessage) {
