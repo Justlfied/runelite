@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Seth <https://github.com/sethtroll>
+ * Copyright (c) 2020, Brandt Hill <https://github.com/BrandtHill>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,18 +22,56 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.grandexchange;
+package net.runelite.client.plugins.kingdomofmiscellania;
 
-import lombok.Value;
-import net.runelite.client.util.AsyncBufferedImage;
+import net.runelite.client.config.Config;
+import net.runelite.client.config.ConfigGroup;
+import net.runelite.client.config.ConfigItem;
+import net.runelite.client.config.Range;
 
-@Value
-class GrandExchangeItems
+@ConfigGroup(KingdomConfig.CONFIG_GROUP_NAME)
+public interface KingdomConfig extends Config
 {
-	private final AsyncBufferedImage icon;
-	private final String name;
-	private final int itemId;
-	private final int gePrice;
-	private final int haPrice;
-	private final int geItemLimit;
+	String CONFIG_GROUP_NAME = "kingdomofmiscellania";
+	int MAX_COFFER = 7_500_000;
+	int MAX_APPROVAL_PERCENT = 100;
+
+	@ConfigItem(
+		position = 1,
+		keyName = "sendNotifications",
+		name = "Send Notifications",
+		description = "Send chat notifications upon login showing current estimated coffer and approval"
+	)
+	default boolean shouldSendNotifications()
+	{
+		return false;
+	}
+
+	@Range(
+		max = MAX_COFFER
+	)
+	@ConfigItem(
+		position = 2,
+		keyName = "cofferThreshold",
+		name = "Coffer Threshold",
+		description = "Send notifications if coffer is below this value"
+	)
+	default int getCofferThreshold()
+	{
+		return MAX_COFFER;
+	}
+
+	@Range(
+		max = MAX_APPROVAL_PERCENT
+	)
+	@ConfigItem(
+		position = 3,
+		keyName = "approvalThreshold",
+		name = "Approval Threshold",
+		description = "Send notifications if approval percentage is below this value"
+	)
+	default int getApprovalThreshold()
+	{
+		return MAX_APPROVAL_PERCENT;
+	}
 }
