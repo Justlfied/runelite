@@ -4,7 +4,10 @@ import com.google.inject.Inject;
 import net.runelite.api.Client;
 import net.runelite.api.NPC;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.events.NpcChanged;
+import net.runelite.api.events.NpcDespawned;
 import net.runelite.api.events.NpcSpawned;
+import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -33,10 +36,14 @@ public class NorthMageHelperPlugin extends Plugin {
     private Client client;
 
     public int phaseTimer = 0;
-    public int phaseCounter = 0;
     public boolean sameWave = false;
     public boolean timerStarted = false;
     public List<NPC> highlightCrabs = new ArrayList<>();
+    public boolean maidenP2 = false;
+    public int n1X = 0;
+    public int n1Y = 0;
+    private boolean checkedX, checkedY;
+    public List<NPC> checkNPCCoords = new ArrayList<>();
 
     /*
         70s Maiden = 8361
@@ -57,90 +64,113 @@ public class NorthMageHelperPlugin extends Plugin {
     }
 
     @Subscribe
+    public void onNpcChanged(NpcChanged npc) {
+        if(npc.getNpc().getId() == 8361) {
+            maidenP2 = true;
+        }
+    }
+
+    @Subscribe
     public void onNpcSpawned(NpcSpawned npcSpawned) {
         int npcId = npcSpawned.getNpc().getId();
 
-        if(npcId == 8366) {
-            log.debug("Crabs Local X: " + npcSpawned.getActor().getLocalLocation().getX() + " | Crabs Local Y: " + npcSpawned.getActor().getLocalLocation().getY());
-        }
-
-        if(npcId == 8366 && phaseCounter == 0) {
-            System.out.println("I am here");
-            freezeList(npcSpawned, phaseTimer);
+        if(npcId == 8366 && !maidenP2) {
+            checkNPCCoords.add(npcSpawned.getNpc());
             timerStarted = true;
-            sameWave = true;
-            phaseCounter++;
+            System.out.println("Timer Started");
         }
 
-        if(npcId == 8366 && phaseTimer > 1 && phaseTimer < 19) {
+        if(npcId == 8366 && maidenP2) {
             freezeList(npcSpawned, phaseTimer);
         }
+    }
 
-        if(npcId == 8366 && phaseCounter == 1 && !sameWave) {
-            timerStarted = false;
-            phaseCounter++;
+    @Subscribe
+    public void onNpcDespawned(NpcDespawned npcDespawned) {
+        if(npcDespawned.getNpc().getId() == 8363) {
+            System.out.println("Maiden Despawned, Timer Stopped");
+            highlightCrabs.clear();
         }
-
     }
 
     @Subscribe
     public void onGameTick(GameTick gameTick) {
+        Widget bossHpValue = client.getWidget(28, 37);
+
+        if(bossHpValue != null && Integer.parseInt(bossHpValue.getText()) < 60 && Integer.parseInt(bossHpValue.getText()) > 40) {
+            maidenP2 = true;
+        } else {
+            maidenP2 = false;
+        }
+
+        if(checkNPCCoords.size() > 0 && !checkedX && !checkedY) {
+            setN1X(checkNPCCoords);
+            setN1Y(checkNPCCoords);
+        }
+
         sameWave = false;
         if(timerStarted) {
             phaseTimer++;
+            System.out.println("TickCounter: " + phaseTimer);
         }
     }
 
+    private void setN1X(List<NPC> crabs) {
+        for (NPC crab : crabs) {
+            if(n1X == 0) {
+                n1X = crab.getLocalLocation().getX();
+            }
+
+            if(crab.getLocalLocation().getX() < n1X) {
+                n1X = crab.getLocalLocation().getX();
+            }
+        }
+        checkedX = true;
+    }
+
+    private void setN1Y(List<NPC> crabs) {
+        for (NPC crab : crabs) {
+            if(n1Y == 0) {
+                n1Y = crab.getLocalLocation().getY();
+            }
+
+            if(crab.getLocalLocation().getY() > n1Y) {
+                n1Y = crab.getLocalLocation().getY();
+            }
+        }
+        checkedY = true;
+    }
+
     private void freezeList(NpcSpawned npc, int phaseTimer) {
-        /*
-           X: 5376 Back of the line
-           Y: 4736 North Side of Room
-
-           Crabs Local X: 6016 | Crabs Local Y: 8448
-           Crabs Local X: 6528 | Crabs Local Y: 5632
-           Crabs Local X: 6528 | Crabs Local Y: 8448
-           Crabs Local X: 7552 | Crabs Local Y: 5632
-           Crabs Local X: 7552 | Crabs Local Y: 8192
-           Crabs Local X: 7552 | Crabs Local Y: 8448
-
-           N1: 5888 5760
-           N2: 6400 5760
-           N3: 6912 5760
-           N4: 7424 5760
-
-           N1: 3840 4736
-           N2: 4352 4736
-           N3: 4863 4736
-           N4: 5376 4736
-        */
+        int n2x = n1X + 512;
+        int n3x = n1X + (512 * 2);
+        int n4x = n1X + (512 * 3);
+        int scuffedY = n1Y - 128;
 
         int npcX = npc.getActor().getLocalLocation().getX();
         int npcY = npc.getActor().getLocalLocation().getY();
 
-        System.out.println("Crabs Local X: " + npc.getActor().getLocalLocation().getX() + " | Crabs Local Y: " + npc.getActor().getLocalLocation().getY());
-
-        if (npcY == 5760 || npcY == 4736) {
+        if (npcY == n1Y || npcY == scuffedY) {
             switch(phaseTimer) {
                 case 13:
-                    if(npcX == 6400 || npcX == 7424 || npcX == 4352 || npcX == 5376) {
+                    if(npcX == n2x || npcX == n4x) {
                         highlightCrabs.add(npc.getNpc());
                     }
                     break;
                 case 14:
                 case 15:
-                    if(npcX == 6400 || npcX == 6912 || npcX == 7424 || npcX == 4352 || npcX == 4863 || npcX == 5376) {
+                    if(npcX == n2x || npcX == n3x || npcX == n4x) {
                         highlightCrabs.add(npc.getNpc());
                     }
                     break;
                 case 16:
                 case 17:
                 case 18:
-                    if(npcX == 5888 || npcX == 6912 || npcX == 7424 || npcX == 3840 || npcX == 4863 || npcX == 5376) {
+                    if(npcX == n1X || npcX == n3x || npcX == n4x) {
                         highlightCrabs.add(npc.getNpc());
                     }
                     break;
                 default:
-                    System.out.println("Here Aswell Aswell!");
                     highlightCrabs.add(npc.getNpc());
             }
         }
