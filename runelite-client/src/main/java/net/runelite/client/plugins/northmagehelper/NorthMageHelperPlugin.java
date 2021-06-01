@@ -64,20 +64,12 @@ public class NorthMageHelperPlugin extends Plugin {
     }
 
     @Subscribe
-    public void onNpcChanged(NpcChanged npc) {
-        if(npc.getNpc().getId() == 8361) {
-            maidenP2 = true;
-        }
-    }
-
-    @Subscribe
     public void onNpcSpawned(NpcSpawned npcSpawned) {
         int npcId = npcSpawned.getNpc().getId();
 
         if(npcId == 8366 && !maidenP2) {
             checkNPCCoords.add(npcSpawned.getNpc());
             timerStarted = true;
-            System.out.println("Timer Started");
         }
 
         if(npcId == 8366 && maidenP2) {
@@ -87,9 +79,10 @@ public class NorthMageHelperPlugin extends Plugin {
 
     @Subscribe
     public void onNpcDespawned(NpcDespawned npcDespawned) {
-        if(npcDespawned.getNpc().getId() == 8363) {
-            System.out.println("Maiden Despawned, Timer Stopped");
+        if(npcDespawned.getNpc().getId() == 8365) {
             highlightCrabs.clear();
+            phaseTimer = 0;
+            timerStarted = false;
         }
     }
 
@@ -97,10 +90,12 @@ public class NorthMageHelperPlugin extends Plugin {
     public void onGameTick(GameTick gameTick) {
         Widget bossHpValue = client.getWidget(28, 37);
 
-        if(bossHpValue != null && Integer.parseInt(bossHpValue.getText()) < 60 && Integer.parseInt(bossHpValue.getText()) > 40) {
-            maidenP2 = true;
-        } else {
-            maidenP2 = false;
+        if(bossHpValue != null && !bossHpValue.isHidden()) {
+            if(Float.parseFloat(bossHpValue.getText().substring(0, bossHpValue.getText().length() - 1)) < 60 && Float.parseFloat(bossHpValue.getText().substring(0, bossHpValue.getText().length() - 1)) > 40) {
+                maidenP2 = true;
+            } else {
+                maidenP2 = false;
+            }
         }
 
         if(checkNPCCoords.size() > 0 && !checkedX && !checkedY) {
@@ -111,7 +106,6 @@ public class NorthMageHelperPlugin extends Plugin {
         sameWave = false;
         if(timerStarted) {
             phaseTimer++;
-            System.out.println("TickCounter: " + phaseTimer);
         }
     }
 
@@ -142,6 +136,7 @@ public class NorthMageHelperPlugin extends Plugin {
     }
 
     private void freezeList(NpcSpawned npc, int phaseTimer) {
+        System.out.println(phaseTimer + " PhaseTimer");
         int n2x = n1X + 512;
         int n3x = n1X + (512 * 2);
         int n4x = n1X + (512 * 3);
@@ -151,6 +146,22 @@ public class NorthMageHelperPlugin extends Plugin {
         int npcY = npc.getActor().getLocalLocation().getY();
 
         if (npcY == n1Y || npcY == scuffedY) {
+//            if(phaseTimer == 13) {
+//                if(npcX == n2x || npcX == n4x) {
+//                    highlightCrabs.add(npc.getNpc());
+//                }
+//            } else if(phaseTimer < 16) {
+//                if(npcX == n2x || npcX == n3x || npcX == n4x) {
+//                    highlightCrabs.add(npc.getNpc());
+//                }
+//            } else if(phaseTimer < 19) {
+//                if(npcX == n1X || npcX == n3x ||  npcX == n4x) {
+//                    highlightCrabs.add(npc.getNpc());
+//                }
+//            } else {
+//                highlightCrabs.add(npc.getNpc());
+//            }
+
             switch(phaseTimer) {
                 case 13:
                     if(npcX == n2x || npcX == n4x) {
@@ -169,6 +180,50 @@ public class NorthMageHelperPlugin extends Plugin {
                     if(npcX == n1X || npcX == n3x || npcX == n4x) {
                         highlightCrabs.add(npc.getNpc());
                     }
+                    break;
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                case 56:
+                case 57:
+                case 58:
+                case 59:
+                case 60:
+                case 61:
+                case 62:
+                case 63:
+                case 64:
+                case 65:
+                case 66:
+                case 67:
+                case 68:
+                case 69:
+                case 70:
+                case 71:
+                case 72:
+                case 73:
+                case 74:
+                case 75:
+                case 76:
+                case 77:
+                case 78:
+                case 79:
+                case 80:
+                case 81:
+                case 82:
+                case 83:
+                case 84:
+                case 85:
+                case 86:
+                case 87:
+                case 88:
+                    if(npcX == n1X || npcX == n3x || npcX == n4x) {
+                        highlightCrabs.add(npc.getNpc());
+                    }
+                    System.out.println("NpcX: " + npcX + " | N1x: " + n1X + " | N2x: " + n2x + " | N3x: " + n3x + " | N4x: " + n4x);
                     break;
                 default:
                     highlightCrabs.add(npc.getNpc());

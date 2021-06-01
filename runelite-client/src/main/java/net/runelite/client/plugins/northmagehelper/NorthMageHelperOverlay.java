@@ -21,9 +21,6 @@ public class NorthMageHelperOverlay extends Overlay {
 
     @Override
     public Dimension render(Graphics2D graphics) {
-        if(plugin.highlightCrabs.size() > 0) {
-            System.out.println(plugin.highlightCrabs);
-        }
         for(NPC npc : plugin.highlightCrabs) {
             renderTargetOverlay(graphics, npc, new Color(0, 0, 255, 80));
         }
