@@ -46,6 +46,10 @@ public class ToBModeDeciderPlugin extends Plugin {
     public String getEnumValue(String enumKey) {
         return getMode() + enumKey;
     }
+        
+    public Enum getEnumValue(Enum enumType String enumKey) {
+        return enumType.valueOf(getMode() + enumKey);
+    }
 
     private void setMode(String tobMode) {
         this.mode = tobMode;
