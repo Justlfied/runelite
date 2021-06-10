@@ -53,7 +53,7 @@ public enum ToBModeDeciderNpcEnum {
 
     END(0);
 
-    private int npcId;
+    public int npcId;
     ToBModeDeciderNpcEnum(int npcId) {
         this.npcId = npcId;
     }
