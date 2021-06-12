@@ -1,6 +1,5 @@
-package net.runelite.client.plugins.tobmodedecider;
+package net.runelite.client.plugins.tobhelper;
 
-import com.google.inject.Inject;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.NpcSpawned;
 import net.runelite.client.eventbus.Subscribe;
@@ -13,17 +12,19 @@ import net.runelite.client.plugins.PluginDescriptor;
         enabledByDefault = true,
         tags = {"baldy"}
 )
-public class ToBModeDeciderPlugin extends Plugin {
+public class TobHelperPlugin extends Plugin {
     private String mode;
-    private ToBModeDeciderEnum modes;
-    private ToBModeDeciderNpcEnum npc;
+    private Boolean set;
+    private TobHelperModeEnum modes;
+    private TobHelperNpcEnum npcEnum;
+    public int npcID;
 
-    private ToBModeDeciderPlugin(String mode, ToBModeDeciderNpcEnum npc) {
+    private TobHelperPlugin(String mode, boolean set) {
         this.mode = "HM";
-        this.npc = npc;
+        this.set = false;
     }
 
-    public ToBModeDeciderPlugin() {
+    public TobHelperPlugin() {
 
     }
 
@@ -31,31 +32,28 @@ public class ToBModeDeciderPlugin extends Plugin {
     private void onChatMessage(ChatMessage message) {
         System.out.println("Message: " + message.getMessage());
         if(message.getMessage().equalsIgnoreCase("enumtest")) {
-            setMode("HM");
-            System.out.println("Message: " + message.getMessage());
-            System.out.println(ToBModeDeciderNpcEnum.valueOf("HM_BLOAT"));
-            System.out.println(ToBModeDeciderNpcEnum.valueOf("HM" + "_BLOAT"));
+            System.out.println(TobHelperNpcEnum.valueOf(getMode() + "_BLOAT").npcId);
         }
-    }
-
-    @Subscribe
-    private void onNpcSpawned(NpcSpawned npc) {
-
     }
 
     public String getEnumValue(String enumKey) {
         return getMode() + enumKey;
     }
-        
-    public Enum getEnumValue(Enum enumType String enumKey) {
-        return enumType.valueOf(getMode() + enumKey);
-    }
 
     private void setMode(String tobMode) {
+        this.setMode();
         this.mode = tobMode;
     }
 
     public String getMode() {
         return this.mode;
+    }
+
+    public void setMode() {
+        this.set = !this.set;
+    }
+
+    private boolean getSet() {
+        return this.set;
     }
 }

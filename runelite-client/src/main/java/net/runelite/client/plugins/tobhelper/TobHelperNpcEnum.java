@@ -1,10 +1,13 @@
-package net.runelite.client.plugins.tobmodedecider;
+package net.runelite.client.plugins.tobhelper;
 
-public enum ToBModeDeciderNpcEnum {
+public enum TobHelperNpcEnum {
     // Maiden
     HM_MAIDEN(10822),
 
-    HM_MAIDEN_CRAB(1828),
+    HM_MAIDEN_CRAB(10828),
+    SM_MAIDEN_CRAB(99999),
+    REG_MAIDEN_CRAB(38294),
+
     HM_MAIDEN_BLOOD_SPAWN(10829),
 
     // Bloat
@@ -54,7 +57,7 @@ public enum ToBModeDeciderNpcEnum {
     END(0);
 
     public int npcId;
-    ToBModeDeciderNpcEnum(int npcId) {
+    TobHelperNpcEnum(int npcId) {
         this.npcId = npcId;
     }
 }
