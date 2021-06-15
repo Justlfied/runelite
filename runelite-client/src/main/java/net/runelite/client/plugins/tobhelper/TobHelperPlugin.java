@@ -15,11 +15,11 @@ import net.runelite.client.plugins.PluginDescriptor;
 public class TobHelperPlugin extends Plugin {
     private String mode;
     private Boolean set;
-    private TobHelperModeEnum modes;
-    private TobHelperNpcEnum npcEnum;
-    public int npcID;
+    public TobHelperModeEnum modes;
+    public TobHelperNpcEnum npcEnum;
 
-    private TobHelperPlugin(String mode, boolean set) {
+    private TobHelperPlugin(String mode, boolean set, TobHelperNpcEnum npcEnum) {
+        this.npcEnum = TobHelperNpcEnum.END;
         this.mode = "HM";
         this.set = false;
     }
@@ -34,6 +34,13 @@ public class TobHelperPlugin extends Plugin {
         if(message.getMessage().equalsIgnoreCase("enumtest")) {
             System.out.println(TobHelperNpcEnum.valueOf(getMode() + "_BLOAT").npcId);
         }
+    }
+
+    @Subscribe
+    private void onNpcSpawned(NpcSpawned npc) {
+        int npcId = npc.getNpc().getId();
+        System.out.println("Npc: " + npcId);
+        System.out.println("Mode: " + TobHelperNpcEnum.getEnumKeyFromId(npcId));
     }
 
     public String getEnumValue(String enumKey) {

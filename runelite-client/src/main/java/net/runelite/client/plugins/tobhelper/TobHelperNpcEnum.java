@@ -60,4 +60,13 @@ public enum TobHelperNpcEnum {
     TobHelperNpcEnum(int npcId) {
         this.npcId = npcId;
     }
+
+    public static String getEnumKeyFromId(int value) {
+        for(TobHelperNpcEnum npc : TobHelperNpcEnum.values()) {
+            if(npc.npcId == value) {
+                return npc.name().substring(0, npc.name().indexOf("_"));
+            }
+        }
+        return null;
+    }
 }
