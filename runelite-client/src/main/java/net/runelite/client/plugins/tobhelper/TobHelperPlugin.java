@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.tobhelper;
 
+import com.google.inject.Inject;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.NpcSpawned;
 import net.runelite.client.eventbus.Subscribe;
@@ -17,6 +18,10 @@ public class TobHelperPlugin extends Plugin {
     private Boolean set;
     public TobHelperModeEnum modes;
     public TobHelperNpcEnum npcEnum;
+    public ToBModeDecider decider;    
+        
+    @Inject
+    private EventBus eventBus;
 
     private TobHelperPlugin(String mode, boolean set, TobHelperNpcEnum npcEnum) {
         this.npcEnum = TobHelperNpcEnum.END;
@@ -26,6 +31,16 @@ public class TobHelperPlugin extends Plugin {
 
     public TobHelperPlugin() {
 
+    }
+        
+    @Override
+    public void onStart() {
+        eventBus.register(decider.class);
+    }
+        
+    @Override
+    public void onShutdoown() {
+        eventBus.unregister(decider.class);       
     }
 
     @Subscribe
