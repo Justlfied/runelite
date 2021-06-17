@@ -9,19 +9,19 @@ public class ToBModeDecider {
     private TobHelperModeEnum tobHelperModeEnum;
     
     @Inject
-    private TobHelperPlugin plugin;
+    private final TobHelperPlugin plugin;
     
-    private ToBModeDecier(TobHelperPlugin plugin) {
+    private ToBModeDecider(TobHelperPlugin plugin) {
         this.plugin = plugin;   
     }
 
     @Subscribe
     public void onNpcSpawned(NpcSpawned npc) {
+        System.out.println(npc.getNpc().getName());
         int npcId = npc.getNpc().getId();
         String npcKey = TobHelperNpcEnum.getEnumKeyFromId(npcId);
-        if(npcKey && npcKey != "end") {
-            this.plugin.mode = npcKey;
-            this.plugin.setMode()
+        if(npcKey != null && !npcKey.equals("end")) {
+            this.plugin.setMode(npcKey);
         }
     }
 }

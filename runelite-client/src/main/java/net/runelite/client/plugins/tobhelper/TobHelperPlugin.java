@@ -3,6 +3,7 @@ package net.runelite.client.plugins.tobhelper;
 import com.google.inject.Inject;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.NpcSpawned;
+import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -34,13 +35,13 @@ public class TobHelperPlugin extends Plugin {
     }
         
     @Override
-    public void onStart() {
-        eventBus.register(decider.class);
+    protected void startUp() {
+        eventBus.register(ToBModeDecider.class);
     }
         
     @Override
-    public void onShutdoown() {
-        eventBus.unregister(decider.class);       
+    protected void shutDown() {
+        eventBus.unregister(ToBModeDecider.class);
     }
 
     @Subscribe
@@ -54,25 +55,19 @@ public class TobHelperPlugin extends Plugin {
     @Subscribe
     private void onNpcSpawned(NpcSpawned npc) {
         int npcId = npc.getNpc().getId();
-        System.out.println("Npc: " + npcId);
-        System.out.println("Mode: " + TobHelperNpcEnum.getEnumKeyFromId(npcId));
+        System.out.println("Is Set: " + set);
     }
 
     public String getEnumValue(String enumKey) {
         return getMode() + enumKey;
     }
 
-    private void setMode(String tobMode) {
-        this.setMode();
+    public void setMode(String tobMode) {
         this.mode = tobMode;
+        this.set = !this.set;
     }
-
     public String getMode() {
         return this.mode;
-    }
-
-    public void setMode() {
-        this.set = !this.set;
     }
 
     private boolean getSet() {
