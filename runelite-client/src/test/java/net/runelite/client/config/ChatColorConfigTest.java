@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Tomas Slusny <slusnucky@gmail.com>
+ * Copyright (c) 2021, Adam <Adam@sigterm.info>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,46 +22,36 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package net.runelite.client.config;
 
-package net.runelite.client.plugins.objectindicators;
+import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Set;
+import static org.junit.Assert.fail;
+import org.junit.Test;
 
-import java.awt.Color;
-import net.runelite.client.config.Alpha;
-import net.runelite.client.config.Config;
-import net.runelite.client.config.ConfigGroup;
-import net.runelite.client.config.ConfigItem;
-
-@ConfigGroup("objectindicators")
-public interface ObjectIndicatorsConfig extends Config
+public class ChatColorConfigTest
 {
-	@Alpha
-	@ConfigItem(
-		keyName = "markerColor",
-		name = "Marker color",
-		description = "Configures the color of object marker"
-	)
-	default Color markerColor()
+	@Test
+	public void testUniqueKeys()
 	{
-		return Color.YELLOW;
-	}
+		final Set<String> configKeyNames = new HashSet<>();
 
-	@ConfigItem(
-		keyName = "rememberObjectColors",
-		name = "Remember color per object",
-		description = "Color objects using the color from time of marking"
-	)
-	default boolean rememberObjectColors()
-	{
-		return false;
-	}
+		for (Method method : ChatColorConfig.class.getMethods())
+		{
+			final ConfigItem annotation = method.getAnnotation(ConfigItem.class);
+			if (annotation == null)
+			{
+				continue;
+			}
 
-	@ConfigItem(
-		keyName = "borderWidth",
-		name = "Border Width",
-		description = "Width of the marked object border"
-	)
-	default double borderWidth()
-	{
-		return 2;
+			final String configKeyName = annotation.keyName();
+			if (configKeyNames.contains(configKeyName))
+			{
+				fail("keyName " + configKeyName + " is duplicated in " + ChatColorConfig.class);
+			}
+
+			configKeyNames.add(configKeyName);
+		}
 	}
 }
