@@ -7,24 +7,25 @@ import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.tobdecider.ToBDeciderPlugin;
 
 @PluginDescriptor(
-        name = "[J] Tob Mode Decider",
-        description = "Plugin that decides Tob Mode",
+        name = "[J] Tob Helper",
+        description = "ToB Helper Class",
         enabledByDefault = true,
         tags = {"baldy"}
 )
 public class TobHelperPlugin extends Plugin {
     private String mode;
-    private Boolean set;
+    private Boolean set = false;
     public TobHelperModeEnum modes;
     public TobHelperNpcEnum npcEnum;
-    public ToBModeDecider decider;    
+    public ToBDeciderPlugin decider;
         
     @Inject
     private EventBus eventBus;
 
-    private TobHelperPlugin(String mode, boolean set, TobHelperNpcEnum npcEnum) {
+    public TobHelperPlugin(String mode, boolean set, TobHelperNpcEnum npcEnum) {
         this.npcEnum = TobHelperNpcEnum.END;
         this.mode = "HM";
         this.set = false;
@@ -33,29 +34,17 @@ public class TobHelperPlugin extends Plugin {
     public TobHelperPlugin() {
 
     }
-        
-    @Override
-    protected void startUp() {
-        eventBus.register(ToBModeDecider.class);
-    }
-        
-    @Override
-    protected void shutDown() {
-        eventBus.unregister(ToBModeDecider.class);
-    }
-
-    @Subscribe
-    private void onChatMessage(ChatMessage message) {
-        System.out.println("Message: " + message.getMessage());
-        if(message.getMessage().equalsIgnoreCase("enumtest")) {
-            System.out.println(TobHelperNpcEnum.valueOf(getMode() + "_BLOAT").npcId);
-        }
-    }
 
     @Subscribe
     private void onNpcSpawned(NpcSpawned npc) {
-        int npcId = npc.getNpc().getId();
-        System.out.println("Is Set: " + set);
+        System.out.println(npc.getNpc().getName());
+        if(!this.set) {
+            int npcId = npc.getNpc().getId();
+            String npcKey = TobHelperNpcEnum.getEnumKeyFromId(npcId);
+            if (npcKey != null && !npcKey.equals("end")) {
+                this.setMode(npcKey);
+            }
+        }
     }
 
     public String getEnumValue(String enumKey) {
@@ -64,7 +53,7 @@ public class TobHelperPlugin extends Plugin {
 
     public void setMode(String tobMode) {
         this.mode = tobMode;
-        this.set = !this.set;
+        this.set = true;
     }
     public String getMode() {
         return this.mode;
